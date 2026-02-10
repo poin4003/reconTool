@@ -11,6 +11,6 @@ var (
 	DB     *gorm.DB
 	Logger *logger.LoggerZap
 
-	ImportSimJobChan = make(chan model.SimModel, 5000)
-	SyncSimJobChan   = make(chan model.SimModel, 5000)
+	ImportSimJobChan = make(chan model.SimModel, 10000)
+	SyncSimJobChan   = make(chan model.SimModel, 10000)
 )
