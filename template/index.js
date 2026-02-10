@@ -153,14 +153,22 @@ const ConfigView = () => `
 const SimView = () => `
     <div class="panel">
         <div class="filter-bar">
-            <div style="display:flex; gap:12px; align-items: flex-end;">
-                <div class="form-group" style="margin:0">
-                    <label>Filter Note</label>
-                    <input id="f-note" placeholder="Search note..." style="width:200px" onkeydown="if(event.key==='Enter') fetchSims(1)">
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items: flex-end; width: 100%; margin-bottom: 10px;">
+                <div class="form-group" style="margin:0; flex:1; min-width: 150px;">
+                    <label>ISDN (Phone)</label>
+                    <input id="f-isdn" placeholder="Search Phone..." onkeydown="if(event.key==='Enter') fetchSims(1)">
                 </div>
-                <div class="form-group" style="margin:0">
+                <div class="form-group" style="margin:0; flex:1; min-width: 150px;">
+                    <label>Serial</label>
+                    <input id="f-serial" placeholder="Search Serial..." onkeydown="if(event.key==='Enter') fetchSims(1)">
+                </div>
+                <div class="form-group" style="margin:0; flex:1; min-width: 150px;">
+                    <label>Note</label>
+                    <input id="f-note" placeholder="Search Note..." onkeydown="if(event.key==='Enter') fetchSims(1)">
+                </div>
+                <div class="form-group" style="margin:0; width: 140px;">
                     <label>Status</label>
-                    <select id="f-status" style="width:140px" onchange="fetchSims(1)">
+                    <select id="f-status" onchange="fetchSims(1)">
                         <option value="">All Status</option>
                         <option value="1">Normal (1)</option>
                         <option value="2">Has Plan (2)</option>
@@ -168,19 +176,19 @@ const SimView = () => `
                         <option value="4">Error (4)</option>
                     </select> 
                 </div>
-                <button onclick="fetchSims(1)">Search</button>
+                <button onclick="fetchSims(1)" style="height: 42px;">Search</button>
             </div>
             
-            <div style="display:flex; gap:8px">
+            <div style="display:flex; gap:8px; width: 100%; border-top: 1px dashed var(--border-color); padding-top: 10px;">
                 <button class="primary" onclick="triggerSyncAll()">▶ SYNC ALL DB</button>
-                <button onclick="openModal()">+ Create</button>
+                <div style="flex:1"></div> <button onclick="openModal()">+ Create</button>
                 <button onclick="document.getElementById('file-import').click()">↑ Import</button>
                 <button onclick="exportExcel()">↓ Export</button>
                 <input type="file" id="file-import" hidden onchange="handleImport(this)">
             </div>
         </div>
     </div>
-
+    
     <div id="selection-bar" class="selection-bar">
         <span id="selection-count" style="font-weight:600">0 items selected</span>
         <div style="display:flex; gap:10px">
@@ -198,14 +206,13 @@ const SimView = () => `
                     <th>Serial</th>
                     <th>Status</th>
                     <th>Note</th>
-                    </tr>
+                </tr>
             </thead>
             <tbody id="sim-table-body"></tbody>
         </table>
-        
         <div id="pagination" style="padding:16px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.1)"></div>
     </div>
-
+    
     <div id="modal-create" class="modal-overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal-content">
             <div class="modal-title">Create New SIM</div>
@@ -329,19 +336,22 @@ window.fetchQueue = async () => {
 
 window.fetchSims = async (p) => {
     STATE.pagination.page = p;
+    
+    // Lấy giá trị từ DOM
     const note = document.getElementById("f-note")?.value.trim();
     const status = document.getElementById("f-status")?.value;
+    const isdn = document.getElementById("f-isdn")?.value.trim();     // Mới
+    const serial = document.getElementById("f-serial")?.value.trim(); // Mới
     
-    // --- KHẮC PHỤC LỖI PARAM RỖNG ---
     const params = new URLSearchParams();
     params.append('page', p);
     params.append('limit', STATE.pagination.limit);
     
-    // Chỉ append nếu có giá trị thực sự
     if (note) params.append('note', note);
     if (status) params.append('status', status);
+    if (isdn) params.append('isdn', isdn);     // Mới
+    if (serial) params.append('serial', serial); // Mới
 
-    // Gọi API với query string chuẩn
     const res = await apiCall(`/api/sim?${params.toString()}`);
     
     if(res.ok) {
@@ -448,10 +458,14 @@ window.syncOne = async (id) => {
 window.exportExcel = () => {
     const note = document.getElementById("f-note").value.trim();
     const status = document.getElementById("f-status").value;
+    const isdn = document.getElementById("f-isdn").value.trim();     // Mới
+    const serial = document.getElementById("f-serial").value.trim(); // Mới
 
     const params = new URLSearchParams();
     if (note) params.append('note', note);
     if (status) params.append('status', status);
+    if (isdn) params.append('isdn', isdn);     // Mới
+    if (serial) params.append('serial', serial); // Mới
 
     window.location.href = `${STATE.baseUrl}/api/sim/export?${params.toString()}`;
 };

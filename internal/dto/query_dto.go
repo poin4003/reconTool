@@ -3,4 +3,6 @@ package dto
 type SimFilter struct {
 	Status string `form:"status"`
 	Note   string `form:"note"`
+	Isdn   string `form:"isdn"`
+	Serial string `form:"serial"`
 }

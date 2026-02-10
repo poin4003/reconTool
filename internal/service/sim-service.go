@@ -34,6 +34,12 @@ func applyFilters(db *gorm.DB, filter dto.SimFilter) *gorm.DB {
 	if filter.Note != "" {
 		db = db.Where("note LIKE ?", "%"+filter.Note+"%")
 	}
+	if filter.Isdn != "" {
+		db = db.Where("isdn LIKE ?", "%"+filter.Isdn+"%")
+	}
+	if filter.Serial != "" {
+		db = db.Where("serial LIKE ?", "%"+filter.Serial+"%")
+	}
 	return db
 }
 
